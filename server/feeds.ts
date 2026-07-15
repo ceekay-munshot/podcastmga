@@ -8,9 +8,9 @@ import { isPublicHttpUrl, safeFetch } from './safeUrl'
 // the Cloudflare Pages Function). Pulls each show's real podcast RSS, parses the
 // latest episodes, and maps them to the app's Episode shape. Keyless.
 //
-// Shows with no clean public feed (Stratechery is members-only; "Access" has no
-// resolvable feed) fall back to that show's seeded episodes, so the dashboard is
-// always populated. A feed that errors or times out also falls back per-source.
+// A show with no clean public feed (feedUrl: null) falls back to that show's
+// seeded episodes, so the dashboard is always populated. A feed that errors or
+// times out also falls back per-source.
 // ─────────────────────────────────────────────────────────────────────────────
 
 interface Source {
@@ -18,20 +18,18 @@ interface Source {
   feedUrl: string | null // verified real RSS feed; null → seed fallback
 }
 
-// Feed URLs resolved + verified via the iTunes Search API.
+// Feed URLs resolved + verified via the iTunes Search API. Ids match Podcast.id in
+// mock-data. Every show has a real public feed.
 const SOURCES: Source[] = [
-  { id: 'stratechery', feedUrl: null }, // members-only, no public feed
-  { id: 'iltb', feedUrl: 'https://feeds.megaphone.fm/CLS2859450455' },
-  { id: 'allin', feedUrl: 'https://rss.libsyn.com/shows/254861/destinations/1928300.xml' },
+  { id: 'wtf', feedUrl: 'https://feeds.hubhopper.com/664690fdea0d7a6f61a052da119934d3.rss' },
+  { id: 'businessbreakdowns', feedUrl: 'https://feeds.megaphone.fm/breakdowns' },
+  { id: 'latticework', feedUrl: 'https://feeds.soundcloud.com/users/soundcloud:users:320438167/sounds.rss' },
   { id: 'oddlots', feedUrl: 'https://www.omnycontent.com/d/playlist/e73c998e-6e60-432f-8610-ae210140c5b1/8a94442e-5a74-4fa2-8b8d-ae27003a8d6b/982f5071-765c-403d-969d-ae27003a8d83/podcast.rss' },
-  { id: 'aidaily', feedUrl: 'https://anchor.fm/s/f7cac464/podcast/rss' },
-  { id: 'ingoodcompany', feedUrl: 'https://feeds.acast.com/public/shows/622618c7057f3400120d15db' },
-  { id: 'acquired', feedUrl: 'https://feeds.transistor.fm/acquired' },
-  { id: 'cheekypint', feedUrl: 'https://feeds.transistor.fm/cheeky-pint-with-john-collison' },
-  { id: 'access', feedUrl: null }, // no resolvable public feed
-  { id: 'bg2', feedUrl: 'https://anchor.fm/s/f06c2370/podcast/rss' },
-  { id: 'lennys', feedUrl: 'https://api.substack.com/feed/podcast/10845.rss' },
-  { id: 'benmarc', feedUrl: 'https://feeds.simplecast.com/mAT9rqvu' },
+  { id: 'mastersinbusiness', feedUrl: 'https://www.omnycontent.com/d/playlist/e73c998e-6e60-432f-8610-ae210140c5b1/4e4cd910-40a1-4619-a5f3-ae2b0012ffff/5873a3cb-298f-40bc-b71f-ae2b0013000d/podcast.rss' },
+  { id: 'bigtake', feedUrl: 'https://www.omnycontent.com/d/playlist/e73c998e-6e60-432f-8610-ae210140c5b1/825d4e29-b616-46f4-afd7-ae2b0013005c/8b1dd624-a026-43e9-8b57-ae2b00130066/podcast.rss' },
+  { id: 'surveillance', feedUrl: 'https://www.omnycontent.com/d/playlist/e73c998e-6e60-432f-8610-ae210140c5b1/8e704079-ca57-4eac-9741-ae27003e2b7f/9739700c-72c3-4176-ae55-ae27003e2b96/podcast.rss' },
+  { id: 'businessweek', feedUrl: 'https://www.omnycontent.com/d/playlist/e73c998e-6e60-432f-8610-ae210140c5b1/3b082bbf-691d-443b-bc59-ae2b0012ff93/9222076a-d22a-4a9f-9d26-ae2b0012ffb4/podcast.rss' },
+  { id: 'bloombergintel', feedUrl: 'https://www.omnycontent.com/d/playlist/e73c998e-6e60-432f-8610-ae210140c5b1/7f534b8c-9e91-429a-b102-ae3c00090c6d/0ad812bf-fd15-4012-a18c-ae3c00090c76/podcast.rss' },
 ]
 
 /** Ids of the curated seed shows. The channel roster (server/channelStore.ts)
