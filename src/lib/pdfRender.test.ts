@@ -72,9 +72,9 @@ describe('weeklyBlocks — Guidepoint house style', () => {
 
 describe('episodeBlocks — episode', () => {
   it('builds the cover, TOC, and all sections incl. the investable insight + key numbers', () => {
-    const allin = EPISODES.find((e) => e.id === 'ep-allin-e184')!
-    const blocks = episodeBlocks(allin, podcastById(allin.podcastId))
-    expect(blocks[0]).toMatchObject({ k: 'cover', title: allin.title })
+    const full = EPISODES.find((e) => e.id === 'ep-oddlots-grid')!
+    const blocks = episodeBlocks(full, podcastById(full.podcastId))
+    expect(blocks[0]).toMatchObject({ k: 'cover', title: full.title })
     expect(blocks[1].k).toBe('toc')
     expect(titles(blocks)).toEqual(['AI Summary', 'Investable Insight', 'Key Numbers', 'Ideas Pitched', 'Highlights', 'Q&A'])
     expect(blocks.some((b) => b.k === 'insight')).toBe(true)
@@ -83,8 +83,8 @@ describe('episodeBlocks — episode', () => {
   })
 
   it('omits the Ideas + Insight sections when an episode pitched nothing', () => {
-    const acquired = EPISODES.find((e) => e.id === 'ep-acquired-tsmc')!
-    const blocks = episodeBlocks(acquired, podcastById(acquired.podcastId))
+    const brief = EPISODES.find((e) => e.id === 'ep-mib-brief')!
+    const blocks = episodeBlocks(brief, podcastById(brief.podcastId))
     expect(titles(blocks)).not.toContain('Ideas Pitched')
     expect(titles(blocks)).not.toContain('Investable Insight')
   })

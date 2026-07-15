@@ -52,19 +52,19 @@ describe('weeklyToWord — institution-grade weekly doc', () => {
 
 describe('summaryToWord — institution-grade episode doc', () => {
   it('opens with a cover naming the show and includes Ideas Pitched', () => {
-    const allin = EPISODES.find((e) => e.id === 'ep-allin-e184')!
-    const html = summaryToWord(allin, podcastById(allin.podcastId))
+    const full = EPISODES.find((e) => e.id === 'ep-oddlots-grid')!
+    const html = summaryToWord(full, podcastById(full.podcastId))
     expect(html).toContain('class="cover"')
-    expect(html).toContain('All-In') // eyebrow = show · author
-    expect(html).toContain(allin.title)
+    expect(html).toContain('Odd Lots') // eyebrow = show · author
+    expect(html).toContain(full.title)
     expect(html).toContain('Ideas Pitched')
-    expect(html).toContain('Long Nvidia (NVDA) into the capex supercycle')
-    expect(html).toContain('Pitched by <b>David Sacks</b>')
+    expect(html).toContain('Own the intermediaries that get paid for balance sheet')
+    expect(html).toContain('Pitched by <b>The guest</b>')
   })
 
   it('omits the Ideas section for an episode with no pitches', () => {
-    const acquired = EPISODES.find((e) => e.id === 'ep-acquired-tsmc')!
-    const html = summaryToWord(acquired, podcastById(acquired.podcastId))
+    const brief = EPISODES.find((e) => e.id === 'ep-mib-brief')!
+    const html = summaryToWord(brief, podcastById(brief.podcastId))
     expect(html).not.toContain('Ideas Pitched')
   })
 })
