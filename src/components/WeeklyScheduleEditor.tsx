@@ -28,6 +28,23 @@ function zoneList(): string[] {
   return ['UTC', 'America/Los_Angeles', 'America/New_York', 'Europe/London', 'Europe/Berlin', 'Asia/Kolkata', 'Asia/Singapore', 'Asia/Tokyo', 'Australia/Sydney']
 }
 
+// A short list of popular zones pinned to the top of the picker with human names, so
+// the common cases are one click away instead of hidden in the full IANA list. India
+// Standard Time is `Asia/Kolkata`, NOT one of the `Indian/*` (Indian Ocean) zones —
+// this surfaces it clearly. Each still also appears in the full "All time zones" group.
+const COMMON_ZONES: { tz: string; name: string }[] = [
+  { tz: 'UTC', name: 'UTC' },
+  { tz: 'Asia/Kolkata', name: 'India Standard Time' },
+  { tz: 'America/Los_Angeles', name: 'US Pacific' },
+  { tz: 'America/New_York', name: 'US Eastern' },
+  { tz: 'Europe/London', name: 'United Kingdom' },
+  { tz: 'Europe/Berlin', name: 'Central Europe' },
+  { tz: 'Asia/Dubai', name: 'Gulf Standard Time' },
+  { tz: 'Asia/Singapore', name: 'Singapore' },
+  { tz: 'Asia/Tokyo', name: 'Japan' },
+  { tz: 'Australia/Sydney', name: 'Australia Eastern' },
+]
+
 /** "GMT+5:30" for a zone right now, for the option label (best-effort). */
 function gmtLabel(tz: string): string {
   try {
@@ -74,10 +91,15 @@ export function WeeklyScheduleEditor() {
     return () => clearTimeout(t)
   }, [state])
 
-  const zones = useMemo(() => {
+  const { common, all } = useMemo(() => {
     const list = zoneList()
     const withSelf = list.includes(draft.timezone) ? list : [draft.timezone, ...list]
-    return withSelf.map((tz) => ({ tz, label: `${tz.replace(/_/g, ' ')}${gmtLabel(tz) ? ` (${gmtLabel(tz)})` : ''}` }))
+    const common = COMMON_ZONES.map(({ tz, name }) => {
+      const g = gmtLabel(tz)
+      return { tz, label: `${name}${g ? ` (${g})` : ''}` }
+    })
+    const all = withSelf.map((tz) => ({ tz, label: `${tz.replace(/_/g, ' ')}${gmtLabel(tz) ? ` (${gmtLabel(tz)})` : ''}` }))
+    return { common, all }
     // Recompute only if the (rare) custom zone changes — offsets are "now"-stable enough for a label.
   }, [draft.timezone])
 
@@ -144,11 +166,20 @@ export function WeeklyScheduleEditor() {
         disabled={state === 'loading'}
         className={`${field} mt-2 w-full`}
       >
-        {zones.map(({ tz, label }) => (
-          <option key={tz} value={tz}>
-            {label}
-          </option>
-        ))}
+        <optgroup label="Common">
+          {common.map(({ tz, label }) => (
+            <option key={`c-${tz}`} value={tz}>
+              {label}
+            </option>
+          ))}
+        </optgroup>
+        <optgroup label="All time zones">
+          {all.map(({ tz, label }) => (
+            <option key={`a-${tz}`} value={tz}>
+              {label}
+            </option>
+          ))}
+        </optgroup>
       </select>
 
       <p className="mt-2.5 text-[12px] leading-snug text-on-surface-variant">
