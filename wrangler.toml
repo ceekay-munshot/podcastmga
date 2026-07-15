@@ -22,9 +22,9 @@
 # NOTE: `name` must match the Pages project name exactly — the Git-integrated
 # build validates this file and fails the whole deploy on a mismatch (or on a
 # missing KV id), leaving production stuck on the last good build.
-name = "podcast"
+name = "podcastmga"
 pages_build_output_dir = "dist"
 
 [[kv_namespaces]]
 binding = "SUMMARIES"
-id = "5e446d710ca84cb5a60da815c7827cf9"
+id = "3f1d81e46efb4412a3e5c35550271114"
